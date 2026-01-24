@@ -34,7 +34,7 @@ The path to the installed Godot executable.
 
 ```yaml
 - name: Install Godot
-        uses: https://git.gay/novadragon/godot-actions/install-godot@v1
+        uses: https://git.gay/novadragon/godot-actions/install-godot@v2.0
         with:
           godot-version: 4.5.1-stable
           install-templates: true
@@ -58,7 +58,7 @@ The path to the Godot executable. Default `~/.local/share/bin/godot`.
 ### Example usage
 
 ```yaml
-- uses: https://git.gay/novadragon/godot-actions/install-godot@v1
+- uses: https://git.gay/novadragon/godot-actions/install-godot@v2.0
   with:
     build-dir: 'build'
 ```

@@ -19,7 +19,14 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Restore Godot from Cache
+      uses: actions/cache/restore@v5
+      id: godot-cache
+      with:
+        key: godot-${{inputs.godot-version}}
+        path: ~/.local/share/bin/godot
     - name: Install Godot
+      if: steps.godot-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         echo {{ inputs.godot-version }}
@@ -28,9 +35,23 @@ runs:
         mkdir -v -p ~/.config/
         mkdir -v -p ~/.local/share/bin
         mv "./Godot_v${{ inputs.godot-version }}_linux.x86_64" ~/.local/share/bin/godot
+    - name: Save Godot to Cache
+      uses: actions/cache/save@v5
+      if: steps.godot-cache.outputs.cache-hit != 'true'
+      with:
+        path: ~/.local/share/bin/godot
+        key: godot-${{inputs.godot-version}}
 
-    - name: Install Godot templates
+      
+    - name: Restore Install Templates from Cache
       if: ${{ inputs.install-templates }}
+      uses: actions/cache/restore@v5
+      id: resource-cache
+      with:
+        key: godot-resource-${{inputs.godot-version}}
+        path: ~/.local/share/godot/export_templates
+    - name: Install Godot templates
+      if: ${{ inputs.install-templates && steps.resource-cache.outputs.cache-hit != 'true'}}
       shell: bash
       env:
         GODOT_TEMPLATES_DIR: ~/.local/share/godot/export_templates
@@ -43,6 +64,12 @@ runs:
         VER="${TEMPO/-/.}"
         mv -v ./templates ~/.local/share/godot/export_templates/$VER
         ls ~/.local/share/godot/export_templates/$VER
+    - name: Save Resources to Cache
+      uses: actions/cache/save@v5
+      if: ${{ inputs.install-templates &&  steps.resource-cache.outputs.cache-hit != 'true'}}
+      with:
+        path: ~/.local/share/godot/export_templates
+        key: godot-resource-${{inputs.godot-version}}
 
     - name: Report back the executable location
       shell: bash
