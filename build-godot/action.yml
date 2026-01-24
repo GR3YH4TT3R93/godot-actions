@@ -5,69 +5,37 @@ inputs:
   build-dir:
     description: 'The chosen build directory'
     required: true
-    default: 'build'
+    default: './build'
   godot-executable:
     description: 'The path to the Godot executable'
     required: false
-    default: /Applications/Godot.app/Contents/MacOS/Godot
+    default: ~/.local/share/bin/godot
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Open Godot editor for reimport
       shell: bash
       run: ${{ inputs.godot-executable }} --import --headless --verbose
-      
-    - name: Build macOS application
-      shell: bash
-      run: |
-        mkdir -p ${{ inputs.build-dir }}/macos
-        ${{ inputs.godot-executable }} --export-debug macOS --headless
-        [ "$(ls -A ${{ inputs.build-dir }}/macos)" ]
-
-    - name: Compress macOS build (to preserve permissions)
-      shell: bash
-      run: |
-        cd ${{ inputs.build-dir }}/macos
-        tar -cvf ./macos.tar --exclude='*.command' ./*
-    
-    - uses: actions/upload-artifact@v4
-      with:
-        name: macos
-        path: ${{ inputs.build-dir }}/macos/macos.tar
 
     - name: Build Windows application
       shell: bash
       run: |
-        mkdir -p ${{ inputs.build-dir }}/windows
-        ${{ inputs.godot-executable }} --export-debug Windows --headless
-        [ "$(ls -A ${{ inputs.build-dir }}/windows)" ]
+        mkdir -v -p ${{ inputs.build-dir }}/windows
+        ${{ inputs.godot-executable }} --display-driver headless --export-release "Windows Desktop" "${{ inputs.build-dir }}/windows/game.exe" 
 
-    - name: Compress Windows build
-      shell: bash
-      run: |
-        cd ${{ inputs.build-dir }}/windows
-        zip -m ./windows.zip ./*
-
-    - uses: actions/upload-artifact@v4
+    - uses: https://data.forgejo.org/forgejo/upload-artifact@v5
       with:
         name: windows
-        path: ${{ inputs.build-dir }}/windows/windows.zip
+        path: ${{ inputs.build-dir }}/windows/
 
     - name: Build Linux application
       shell: bash
       run: |
-        mkdir -p ${{ inputs.build-dir }}/linux
-        ${{ inputs.godot-executable }} --export-debug Linux --headless
-        [ "$(ls -A ${{ inputs.build-dir }}/linux)" ]
+        mkdir -v -p ${{ inputs.build-dir }}/linux
+        ${{ inputs.godot-executable }} --display-driver headless --export-release "Linux" "${{ inputs.build-dir }}/linux/game.x86_64" 
 
-    - name: Compress Linux build (to preserve permissions)
-      shell: bash
-      run: |
-        cd ${{ inputs.build-dir }}/linux
-        tar -cvf ./linux.tar ./*
-
-    - uses: actions/upload-artifact@v4
+    - uses: https://data.forgejo.org/forgejo/upload-artifact@v5
       with:
         name: linux
-        path: ${{ inputs.build-dir }}/linux/linux.tar
+        path: ${{ inputs.build-dir }}/linux/
