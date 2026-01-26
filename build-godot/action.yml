@@ -10,32 +10,46 @@ inputs:
     description: 'The path to the Godot executable'
     required: false
     default: ~/.local/share/bin/godot
+  game-name:
+    description: 'Name of the executable'
+    required: false
+    default: game
+  platform:
+    description: 'What Platform to build'
+    required: true
+    default: Linux
+  version-string:
+    description: 'What version string the build should have'
+    required: false
+    default: 'dev'
+  path_to_project:
+    description: "Where your Project is"
+    required: false
+    default: ""
+  
 
 runs:
   using: composite
   steps:
     - name: Open Godot editor for reimport
       shell: bash
-      run: ${{ inputs.godot-executable }} --import --headless --verbose
+      run: ${{ inputs.godot-executable }} ${{inputs.path_to_project}} --import --headless
 
-    - name: Build Windows application
+    - name: Build ${{ inputs.platform }} application
       shell: bash
       run: |
-        mkdir -v -p ${{ inputs.build-dir }}/windows
-        ${{ inputs.godot-executable }} --display-driver headless --export-release "Windows Desktop" "${{ inputs.build-dir }}/windows/game.exe" 
+        mkdir -v -p ${{ inputs.build-dir }}
+        ENDING=".zip"
+        PLAT="${{inputs.platform}}"
+        if [ "${{contains(inputs.platform, 'Web')}}" ]; then
+          ENDING=".html"
+        fi
+        ${{ inputs.godot-executable }} ${{ inputs.path_to_project }} --headless --export-release "${{ inputs.platform }}" "${{ inputs.build-dir }}/${{ inputs.game-name }}_${{ inputs.platform }}_${{ inputs.version-string }}${ENDING}"
 
     - uses: https://data.forgejo.org/forgejo/upload-artifact@v5
       with:
-        name: windows
-        path: ${{ inputs.build-dir }}/windows/
+        if_no_files_found: error
+        name: ${{ inputs.game-name }}_${{inputs.platform}}_${{inputs.version-string}}
+        path: ${{ inputs.build-dir }}
 
-    - name: Build Linux application
-      shell: bash
-      run: |
-        mkdir -v -p ${{ inputs.build-dir }}/linux
-        ${{ inputs.godot-executable }} --display-driver headless --export-release "Linux" "${{ inputs.build-dir }}/linux/game.x86_64" 
-
-    - uses: https://data.forgejo.org/forgejo/upload-artifact@v5
-      with:
-        name: linux
-        path: ${{ inputs.build-dir }}/linux/
+   

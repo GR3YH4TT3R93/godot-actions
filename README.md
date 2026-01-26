@@ -34,7 +34,7 @@ The path to the installed Godot executable.
 
 ```yaml
 - name: Install Godot
-        uses: https://git.gay/novadragon/godot-actions/install-godot@v2.0
+        uses: https://git.gay/novadragon/godot-actions/install-godot@v2.5
         with:
           godot-version: 4.5.1-stable
           install-templates: true
@@ -55,10 +55,27 @@ This action builds Windows, and Linux executables for the Godot project within t
 
 The path to the Godot executable. Default `~/.local/share/bin/godot`.
 
+#### `platform`
+
+What platform should be built. Should be the same string as the export template. Default `Linux`
+
+#### `version-string`
+
+What the version string should be of the export. Default `dev`
+
+#### `game_name`
+
+The name the game identifies as. Default `game`
+
+#### `path_to_project`
+
+Where in the repository the project is. Default ``
+
 ### Example usage
 
 ```yaml
-- uses: https://git.gay/novadragon/godot-actions/install-godot@v2.0
+- uses: https://git.gay/novadragon/godot-actions/install-godot@v2.5
   with:
-    build-dir: 'build'
+    build-dir: './build'
+    game-name: 'My awesome game'
 ```
