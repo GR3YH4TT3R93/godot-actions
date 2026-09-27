@@ -1,14 +1,13 @@
 # GitHub Actions for Godot
 
 This repo provides a collection of forgejo actions related to the Godot game engine, including:
+
 - [`install-godot`](#install-godot)
 - [`build-godot`](#build-godot)
 
 See below for more details on usage of each action.
 
 **Note: all actions in this repo are currently designed to run inside of git.gays docker container, assume builds use GDScript, a released binary engine version, and do not require compilation and linking of source plugins.**
-
-
 
 ## `install-godot`
 
@@ -34,7 +33,7 @@ The path to the installed Godot executable.
 
 ```yaml
 - name: Install Godot
-        uses: https://git.gay/novadragon/godot-actions/install-godot@v2.5
+        uses: https://git.ourserver.fun/GR3YH4TT3R93/godot-actions/install-godot@v2.5
         with:
           godot-version: 4.5.1-stable
           install-templates: true
@@ -74,7 +73,7 @@ Where in the repository the project is. Default ``
 ### Example usage
 
 ```yaml
-- uses: https://git.gay/novadragon/godot-actions/install-godot@v2.5
+- uses: https://git.ourserver.fun/GR3YH4TT3R93/godot-actions/install-godot@v2.5
   with:
     build-dir: './build'
     game-name: 'My awesome game'
